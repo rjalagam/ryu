@@ -23,6 +23,7 @@ from __future__ import print_function
 import logging
 import operator
 import os
+import stat
 import re
 import sys
 import weakref
@@ -69,7 +70,9 @@ def valid_ovsdb_addr(addr):
     m = re.match(r'unix:(\S+)', addr)
     if m:
         file = m.group(1)
-        return os.path.isfile(file)
+        mode = os.stat(file).st_mode
+        isSocket = stat.S_ISSOCK(mode)
+        return isSocket
     # Assumes TCP/SSL socket format: "tcp:ip:port" or "ssl:ip:port"
     m = re.match(r'(tcp|ssl):(\S+):(\d+)', addr)
     if m:
